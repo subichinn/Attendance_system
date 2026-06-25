@@ -142,7 +142,7 @@ function App() {
   const resetAttendance = async () => {
     try {
       // 1. Tell the database to delete today's records
-      const response = await fetch(`${API_URL}/attendance/today`, {
+      const response = await fetch(`${API_URL}/attendance?today=true`, {
         method: "DELETE"
       });
 
