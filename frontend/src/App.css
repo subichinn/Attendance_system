@@ -1,0 +1,199 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c8f0ff 0%, #e8f8f0 40%, #fff5e6 100%);
+  font-family: 'Segoe UI', 'Inter', sans-serif;
+  color: #2d4a6e;
+}
+
+/* ── Main Container ── */
+.container {
+  max-width: 860px;
+  margin: 40px auto;
+  padding: 0 20px 40px;
+}
+
+/* ── Heading ── */
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a6fa8;
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+  text-shadow: 0 1px 3px rgba(100, 180, 255, 0.3);
+}
+
+/* ── Summary Bar ── */
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  padding: 18px 28px;
+  margin-bottom: 28px;
+  box-shadow:
+    0 4px 20px rgba(100, 180, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.summary h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a6fa8;
+  background: rgba(200, 240, 255, 0.6);
+  padding: 8px 18px;
+  border-radius: 30px;
+  border: 1px solid rgba(100, 180, 255, 0.3);
+}
+
+/* Reset Button */
+.summary button {
+  background: linear-gradient(135deg, #ff9a7c, #ff6b8a);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  box-shadow: 0 3px 12px rgba(255, 107, 138, 0.35);
+  letter-spacing: 0.3px;
+}
+
+.summary button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 107, 138, 0.4);
+}
+
+.summary button:active {
+  transform: scale(0.97);
+}
+
+/* ── Table ── */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 6px 30px rgba(100, 180, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+thead {
+  background: linear-gradient(90deg, rgba(100, 195, 255, 0.35), rgba(100, 240, 190, 0.3));
+}
+
+thead th {
+  padding: 15px 20px;
+  text-align: left;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: #1a6fa8;
+  border-bottom: 1.5px solid rgba(100, 180, 255, 0.25);
+}
+
+tbody tr {
+  transition: background 0.18s;
+}
+
+tbody tr:hover {
+  background: rgba(200, 240, 255, 0.35);
+}
+
+tbody tr:not(:last-child) {
+  border-bottom: 1px solid rgba(160, 210, 255, 0.2);
+}
+
+tbody td {
+  padding: 13px 20px;
+  font-size: 0.95rem;
+  color: #2d4a6e;
+  border-bottom: 1px solid rgba(160, 210, 255, 0.15);
+}
+
+/* Roll No subtle style */
+tbody td:first-child {
+  font-weight: 600;
+  color: #3a85c8;
+}
+
+/* Status column */
+tbody td:last-child {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1a6fa8;
+  text-align: center;
+}
+
+/* ── P / A Buttons ── */
+tbody td button {
+  border: none;
+  border-radius: 22px;
+  padding: 7px 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: transform 0.13s, box-shadow 0.13s, filter 0.13s;
+  letter-spacing: 0.5px;
+}
+
+/* Present button — minty green */
+tbody td button:first-child {
+  background: linear-gradient(135deg, #6ee7c0, #2ecc9a);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(46, 204, 154, 0.35);
+}
+
+tbody td button:first-child:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(46, 204, 154, 0.4);
+}
+
+/* Absent button — soft coral */
+tbody td button:last-child {
+  background: linear-gradient(135deg, #ffc08a, #ff7f4f);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(255, 127, 79, 0.35);
+}
+
+tbody td button:last-child:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(255, 127, 79, 0.4);
+}
+
+tbody td button:active {
+  transform: scale(0.96);
+}
+
+/* ── No students row ── */
+tbody td[colspan="4"] {
+  text-align: center;
+  color: #7aabcf;
+  font-size: 0.95rem;
+  padding: 30px;
+  font-style: italic;
+}
