@@ -2,52 +2,47 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
-
-
-
   const [students, setStudents] = useState([]);
 
-
-
-
-  // useEffect calls backend
   useEffect(() => {
     getStudents();
   }, []);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-
-
-
-
-//Calls backend and gets data
+  // Fetch students and today's attendance
   const getStudents = async () => {
     try {
-      // Fetch students and today's attendance simultaneously
       const [studentsRes, attendanceRes] = await Promise.all([
-        // fetch("http://localhost:3000/students"),
         fetch(`${API_URL}/students`),
-        // fetch("http://localhost:3000/attendance/today")
         fetch(`${API_URL}/attendance`),
       ]);
 
       const studentsData = await studentsRes.json();
       const attendanceData = await attendanceRes.json();
 
+      console.log("Students Data:", studentsData);
+      console.log("Attendance Data:", attendanceData);
 
       const attendanceMap = {};
-      attendanceData.forEach(record => {
-        const sId = record.studentId._id || record.studentId;
-        attendanceMap[sId] = record.status;
+
+      attendanceData.forEach((record) => {
+        // Skip invalid records
+        if (!record || !record.studentId) return;
+
+        const sId =
+          typeof record.studentId === "object"
+            ? record.studentId._id
+            : record.studentId;
+
+        if (sId) {
+          attendanceMap[sId] = record.status;
+        }
       });
 
-
-
-
-      const updatedStudents = studentsData.map(student => ({
+      const updatedStudents = studentsData.map((student) => ({
         ...student,
-        attendance: attendanceMap[student._id] || "" 
+        attendance: attendanceMap[student._id] || "",
       }));
 
       setStudents(updatedStudents);
@@ -56,272 +51,188 @@ function App() {
     }
   };
 
-  // Save attendance in MongoDB
-  const saveAttendance = async (
-    studentId,
-    status
-  ) => {
-
+  // Save attendance
+  const saveAttendance = async (studentId, status) => {
     try {
-
-      await fetch(
-        `${API_URL}/attendance`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-
-            studentId,
-
-            status,
-
-            date: new Date()
-              .toISOString()
-              .split("T")[0]
-
-          })
-        }
-      );
-
-      console.log(
-        "Attendance Saved"
-      );
-
+      await fetch(`${API_URL}/attendance`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId,
+          status,
+          date: new Date().toISOString().split("T")[0],
+        }),
+      });
+    } catch (err) {
+      console.log("Error saving attendance:", err);
     }
-    catch (err) {
-
-      console.log(
-        "Error saving attendance:",
-        err
-      );
-
-    }
-
   };
 
   // Update UI immediately
-  const markAttendance = (
-    id,
-    status
-  ) => {
-
+  const markAttendance = (id, status) => {
     setStudents(
-      students.map(student =>
+      students.map((student) =>
         student._id === id
           ? {
-            ...student,
-            attendance: status
-          }
+              ...student,
+              attendance: status,
+            }
           : student
       )
     );
-
   };
 
-  // Present count
-  const presentCount =
-    students.filter(
-      student =>
-        student.attendance === "P"
-    ).length;
+  // Counts
+  const presentCount = students.filter(
+    (student) => student.attendance === "P"
+  ).length;
 
-  // Absent count
-  const absentCount =
-    students.filter(
-      student =>
-        student.attendance === "A"
-    ).length;
+  const absentCount = students.filter(
+    (student) => student.attendance === "A"
+  ).length;
 
-  // Reset button
-  // True Reset Button
+  // Reset Attendance
   const resetAttendance = async () => {
     try {
-      // 1. Tell the database to delete today's records
-      const response = await fetch(`${API_URL}/attendance?today=true`, {
-        method: "DELETE"
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete records from the database");
-      }
-
-      console.log("Database successfully reset for today.");
-
-      // 2. Only wipe the UI state AFTER the database confirms deletion
-      setStudents(
-        students.map(student => ({
-          ...student,
-          attendance: ""
-        }))
+      const response = await fetch(
+        `${API_URL}/attendance/today`,
+        {
+          method: "DELETE",
+        }
       );
 
+      if (!response.ok) {
+        throw new Error("Failed to reset");
+      }
+
+      setStudents(
+        students.map((student) => ({
+          ...student,
+          attendance: "",
+        }))
+      );
     } catch (err) {
-      console.log("Error resetting attendance:", err);
-      alert("Could not reset attendance. Please check your connection.");
+      console.log("Error resetting:", err);
+      alert("Unable to reset attendance");
     }
   };
 
   return (
-
     <div className="container">
+      <h1>ATTENDANCE MANAGEMENT SYSTEM</h1>
 
-      <h1>
-        Attendance Management System
-      </h1>
-
+      {/* SUMMARY */}
       <div className="summary">
+        <div className="card present-card">
+          Total Present : {presentCount}
+        </div>
 
-        <h3>
-          Total  Present :
-          {" "}
-          {presentCount}
-        </h3>
-
-        <h3>
-          Total Absent :
-          {" "}
-          {absentCount}
-        </h3>
+        <div className="card absent-card">
+          Total Absent : {absentCount}
+        </div>
 
         <button
+          className="reset-btn"
           onClick={resetAttendance}
         >
           Reset All
         </button>
-
       </div>
 
+      {/* TABLE */}
       <table>
-
         <thead>
-
           <tr>
-
-            <th>
-              Roll No
-            </th>
-
-            <th>
-              Name
-            </th>
-
-            <th>
-              Actions
-            </th>
-
-            <th>
-              Status
-            </th>
-
+            <th>ROLL NO</th>
+            <th>NAME</th>
+            <th>ACTIONS</th>
+            <th>STATUS</th>
           </tr>
-
         </thead>
 
         <tbody>
+          {students.length === 0 ? (
+            <tr>
+              <td
+                colSpan="4"
+                style={{ textAlign: "center" }}
+              >
+                No Students Found
+              </td>
+            </tr>
+          ) : (
+            students.map((student) => (
+              <tr key={student._id}>
+                <td>{student.rollNo}</td>
 
-          {
-            students.length === 0
-              ? (
-                <tr>
+                <td>{student.name}</td>
 
-                  <td
-                    colSpan="4"
-                    style={{
-                      textAlign: "center"
+                {/* ACTIONS */}
+                <td>
+                  <button
+                    className={`present-btn ${
+                      student.attendance === "P"
+                        ? "active-p"
+                        : ""
+                    }`}
+                    onClick={() => {
+                      markAttendance(
+                        student._id,
+                        "P"
+                      );
+                      saveAttendance(
+                        student._id,
+                        "P"
+                      );
                     }}
                   >
-                    No Students Found
-                  </td>
+                    P
+                  </button>
 
-                </tr>
-              )
-              : (
-                students.map(student => (
-
-                  <tr
-                    key={student._id}
+                  <button
+                    className={`absent-btn ${
+                      student.attendance === "A"
+                        ? "active-a"
+                        : ""
+                    }`}
+                    onClick={() => {
+                      markAttendance(
+                        student._id,
+                        "A"
+                      );
+                      saveAttendance(
+                        student._id,
+                        "A"
+                      );
+                    }}
                   >
+                    A
+                  </button>
+                </td>
 
-                    <td>
-                      {student.rollNo}
-                    </td>
-
-                    <td>
-                      {student.name}
-                    </td>
-
-                    <td>
-
-                      <button
-
-                        onClick={() => {
-
-                          markAttendance(
-                            student._id,
-                            "P"
-                          );
-
-                          saveAttendance(
-                            student._id,
-                            "P"
-                          );
-
-                        }}
-
-                      >
-                        P
-                      </button>
-
-                      <button
-
-                        onClick={() => {
-
-                          markAttendance(
-                            student._id,
-                            "A"
-                          );
-
-                          saveAttendance(
-                            student._id,
-                            "A"
-                          );
-
-                        }}
-
-                      >
-                        A
-                      </button>
-
-                    </td>
-
-                    <td>
-
-                      {
-                        student.attendance
-                        || "-"
-                      }
-
-                    </td>
-
-                  </tr>
-
-                ))
-              )
-          }
-
+                {/* STATUS */}
+                <td>
+                  <span
+                    className={`status ${
+                      student.attendance === "P"
+                        ? "status-p"
+                        : student.attendance === "A"
+                        ? "status-a"
+                        : "status-empty"
+                    }`}
+                  >
+                    {student.attendance || "-"}
+                  </span>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
-
       </table>
-
     </div>
-
   );
-
 }
 
 export default App;
